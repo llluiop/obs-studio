@@ -48,6 +48,7 @@ extern void build_window_strings(const char *str,
 	strlist_free(strlist);
 }
 
+
 static HMODULE kernel32(void)
 {
 	static HMODULE kernel32_handle = NULL;
@@ -275,4 +276,32 @@ HWND find_window(enum window_search_mode mode,
 	}
 
 	return best_window;
+}
+
+void get_window_encode_strings(struct dstr * encode, const HWND window)
+{
+	struct dstr class = { 0 };
+	struct dstr title = { 0 };
+	struct dstr exe = { 0 };
+
+	if (!get_window_exe(&exe, window))
+		return;
+	get_window_title(&title, window);
+	get_window_class(&class, window);
+
+
+	encode_dstr(&title);
+	encode_dstr(&class);
+	encode_dstr(&exe);
+
+	dstr_cat_dstr(encode, &title);
+	dstr_cat(encode, ":");
+	dstr_cat_dstr(encode, &class);
+	dstr_cat(encode, ":");
+	dstr_cat_dstr(encode, &exe);
+
+
+	dstr_free(&class);
+	dstr_free(&title);
+	dstr_free(&exe);
 }

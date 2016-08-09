@@ -22,6 +22,8 @@ extern void build_window_strings(const char *str,
 		char **title,
 		char **exe);
 
+extern void get_window_encode_strings(struct dstr *encode, const HWND window);
+
 extern HWND find_window(enum window_search_mode mode,
 		enum window_priority priority,
 		const char *class,
