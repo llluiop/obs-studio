@@ -93,7 +93,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\build\libobs\Debug\obs.lib;..\build\deps\libff\Debug\libff.lib;..\thirdparty\dependencies2015\win32\include\..\bin\libcurl.lib;..\thirdparty\dependencies2015\win32\include\..\bin\avcodec.lib;..\thirdparty\dependencies2015\win32\include\..\bin\avfilter.lib;..\thirdparty\dependencies2015\win32\include\..\bin\avdevice.lib;..\thirdparty\dependencies2015\win32\include\..\bin\avutil.lib;..\thirdparty\dependencies2015\win32\include\..\bin\swscale.lib;..\thirdparty\dependencies2015\win32\include\..\bin\avformat.lib;..\thirdparty\dependencies2015\win32\include\..\bin\swresample.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\build\plugins\win-capture\Debug\win-capture.lib;..\build\libobs\Debug\obs.lib;..\build\deps\libff\Debug\libff.lib;..\thirdparty\dependencies2015\win32\include\..\bin\libcurl.lib;..\thirdparty\dependencies2015\win32\include\..\bin\avcodec.lib;..\thirdparty\dependencies2015\win32\include\..\bin\avfilter.lib;..\thirdparty\dependencies2015\win32\include\..\bin\avdevice.lib;..\thirdparty\dependencies2015\win32\include\..\bin\avutil.lib;..\thirdparty\dependencies2015\win32\include\..\bin\swscale.lib;..\thirdparty\dependencies2015\win32\include\..\bin\avformat.lib;..\thirdparty\dependencies2015\win32\include\..\bin\swresample.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>setlocal

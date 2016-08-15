@@ -2,7 +2,6 @@
 #define __obs_wrapper_h__
 
 #include "obs.h"
-#include <obs.hpp>
 #include <windows.h>
 #include <util/util.hpp>
 #include <memory>
@@ -25,8 +24,8 @@ struct MonitorInfo {
 
 class OBSWrapper
 {
-	const char* GAMESOURCE = "Game Capture";
-	const char* GAMESOURCEID = "game_capture";
+	const char* GAMESOURCE = "Window Capture";
+	const char* GAMESOURCEID = "window_capture";
 public:
 	OBSWrapper();
 	~OBSWrapper();
@@ -65,13 +64,19 @@ private:
 	bool InitService();
 	bool LoadService();
 	void InitPrimitives();
+	void InitDefaultTransitions();
 	void Load(const char * file);
+	void SetCurrentScene(obs_source_t * scene, bool force);
+	void TransitionToScene(obs_source_t * source, bool force);
+	void ClearSceneData();
+	void SetTransition(obs_source_t * transition);
 	void createDefaultScene(bool firstStart);
 	void clearSceneData();
 	void AddScene(OBSSource source);
 	bool InitBasicConfigDefaults();
 	int GetProfilePath(char * path, size_t size, const char * file) const;
 	bool InitBasicConfig();
+	bool InitGlobalConfigDefaults();
 	bool initOBS();
 
 
@@ -81,6 +86,7 @@ private:
 	ConfigFile config;
 	ConfigFile basicConfig;
 	OBSService service;
+	OBSSource fadeTransition;
 
 	gs_vertbuffer_t *box = nullptr;
 	gs_vertbuffer_t *boxLeft = nullptr;

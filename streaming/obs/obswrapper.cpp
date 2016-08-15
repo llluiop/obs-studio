@@ -17,6 +17,8 @@
 #include <vector>
 #include <curl/curl.h>
 
+
+extern "C" void __declspec(dllexport) get_window_encode_strings(struct dstr *encode, const HWND window);
 #define SIMPLE_ENCODER_X264 "x264"
 #define DL_OPENGL "libobs-opengl.dll"
 #define DL_D3D11 "libobs-d3d11.dll"
@@ -90,15 +92,22 @@ bool OBSWrapper::CreateGameSource(const HWND window)
 	}
 
 
-// 	struct dstr encode = { 0 };
-// 	get_window_encode_strings(&encode, window);
-// 	OBSData settings = obs_source_get_settings(source);
-// 	obs_data_set_string(settings, "window",
-// 		encode.array);
-// 	dstr_free(&encode);
+  	struct dstr encode = { 0 };
+  	get_window_encode_strings(&encode, window);
+  	OBSData settings = obs_source_get_settings(source);
+  	obs_data_set_string(settings, "window",
+  		encode.array);
+	obs_source_update(source, settings);
+  	dstr_free(&encode);
+
+	obs_data_t *svr = obs_service_get_settings(service);
+	obs_data_set_string(svr, "server", "rtmp://send1.douyu.com/live");
+	obs_data_set_string(svr, "key", "907136rvGEswUVl6?wsSecret=74f1eea1f0b15fb0cfeca52024c0557e&wsTime=57b11d35");
+	obs_data_set_string(svr, "type", "rtmp_custom");
 
 
-
+	if (!outputHandler->StartStreaming(service)) {
+	}
 	return true;
 }
 
@@ -364,8 +373,56 @@ static bool MakeUserDirs()
 }
 
 
+bool OBSWrapper::InitGlobalConfigDefaults()
+{
+	config_set_default_string(config, "General", "Language",
+		"en-US");
+	config_set_default_uint(config, "General", "MaxLogs", 10);
+	config_set_default_string(config, "General", "ProcessPriority",
+		"Normal");
+
+
+	config_set_default_string(config, "Video", "Renderer",
+		"Direct3D 11");
+
+
+	config_set_default_bool(config, "BasicWindow", "PreviewEnabled",
+		true);
+	config_set_default_bool(config, "BasicWindow",
+		"PreviewProgramMode", false);
+	config_set_default_bool(config, "BasicWindow",
+		"SceneDuplicationMode", true);
+	config_set_default_bool(config, "BasicWindow",
+		"SwapScenesMode", true);
+	config_set_default_bool(config, "BasicWindow",
+		"SnappingEnabled", true);
+	config_set_default_bool(config, "BasicWindow",
+		"ScreenSnapping", true);
+	config_set_default_bool(config, "BasicWindow",
+		"SourceSnapping", true);
+	config_set_default_bool(config, "BasicWindow",
+		"CenterSnapping", false);
+	config_set_default_double(config, "BasicWindow",
+		"SnapDistance", 10.0);
+	config_set_default_bool(config, "BasicWindow",
+		"RecordWhenStreaming", false);
+	config_set_default_bool(config, "BasicWindow",
+		"KeepRecordingWhenStreamStops", false);
+	config_set_default_bool(config, "BasicWindow",
+		"ShowTransitions", true);
+	config_set_default_bool(config, "BasicWindow",
+		"ShowListboxToolbars", true);
+	config_set_default_bool(config, "BasicWindow",
+		"ShowStatusBar", true);
+
+
+	return true;
+}
+
+
 bool OBSWrapper::initOBS()
 {
+	MakeUserDirs();
 
 	char path[512];
 
@@ -381,7 +438,7 @@ bool OBSWrapper::initOBS()
 		return false;
 	}
 
-	MakeUserDirs();
+	InitGlobalConfigDefaults();
 
 	config_set_default_string(config, "Basic", "Profile",
 		("Untitled"));
@@ -503,7 +560,7 @@ bool OBSWrapper::LoadService()
 	const char *type;
 
 	char serviceJsonPath[512];
-	int ret = os_get_config_path(serviceJsonPath, sizeof(serviceJsonPath),
+	int ret = GetProfilePath(serviceJsonPath, sizeof(serviceJsonPath),
 		SERVICE_PATH);
 	if (ret <= 0)
 		return false;
@@ -572,6 +629,33 @@ void OBSWrapper::InitPrimitives()
 }
 
 
+
+
+void OBSWrapper::InitDefaultTransitions()
+{
+	std::vector<OBSSource> transitions;
+	size_t idx = 0;
+	const char *id;
+
+	/* automatically add transitions that have no configuration (things
+	* such as cut/fade/etc) */
+	while (obs_enum_transition_types(idx++, &id)) {
+		if (!obs_is_source_configurable(id)) {
+			const char *name = obs_source_get_display_name(id);
+
+			obs_source_t *tr = obs_source_create_private(
+				id, name, NULL);
+			//InitTransition(tr);
+			transitions.emplace_back(tr);
+
+			if (strcmp(id, "fade_transition") == 0)
+				fadeTransition = tr;
+
+			obs_source_release(tr);
+		}
+	}
+}
+
 void OBSWrapper::Load(const char *file)
 {
 	//if (!file || !os_file_exists(file)) {
@@ -579,27 +663,130 @@ void OBSWrapper::Load(const char *file)
 		createDefaultScene(true); //create it always
 	//	return;
 	//}
+// 		ClearSceneData();
+// 		InitDefaultTransitions();
+// 		SetTransition(fadeTransition);
+
 
 }
+
+void OBSWrapper::SetCurrentScene(obs_source_t *scene, bool force)
+{
+	
+		TransitionToScene(scene, force);
+
+	
+// 
+// 	if (obs_scene_get_source(GetCurrentScene()) != scene) {
+// 		for (int i = 0; i < ui->scenes->count(); i++) {
+// 			QListWidgetItem *item = ui->scenes->item(i);
+// 			OBSScene itemScene = GetOBSRef<OBSScene>(item);
+// 			obs_source_t *source = obs_scene_get_source(itemScene);
+// 
+// 			if (source == scene) {
+// 				ui->scenes->blockSignals(true);
+// 				ui->scenes->setCurrentItem(item);
+// 				ui->scenes->blockSignals(false);
+// 				break;
+// 			}
+// 		}
+// 	}
+
+	//UpdateSceneSelection(scene);
+}
+
+
+void OBSWrapper::TransitionToScene(obs_source_t *source, bool force)
+{
+	obs_scene_t *scene = obs_scene_from_source(source);
+	if (!scene)
+		return;
+
+	obs_source_t *transition = obs_get_output_source(0);
+
+	if (force)
+		obs_transition_set(transition, source);
+	//else
+	//	obs_transition_start(transition, OBS_TRANSITION_MODE_AUTO,
+	//		ui->transitionDuration->value(), source);
+
+	obs_source_release(transition);
+}
+
+void OBSWrapper::ClearSceneData()
+{
+	obs_set_output_source(0, nullptr);
+	obs_set_output_source(1, nullptr);
+	obs_set_output_source(2, nullptr);
+	obs_set_output_source(3, nullptr);
+	obs_set_output_source(4, nullptr);
+	obs_set_output_source(5, nullptr);
+
+
+	auto cb = [](void *unused, obs_source_t *source)
+	{
+		obs_source_remove(source);
+		UNUSED_PARAMETER(unused);
+		return true;
+	};
+
+	obs_enum_sources(cb, nullptr);
+
+
+	blog(LOG_INFO, "All scene data cleared");
+	blog(LOG_INFO, "------------------------------------------------");
+}
+
+void OBSWrapper::SetTransition(obs_source_t *transition)
+{
+	obs_source_t *oldTransition = obs_get_output_source(0);
+
+	if (oldTransition && transition) {
+		obs_transition_swap_begin(transition, oldTransition);
+// 		if (transition != GetCurrentTransition())
+// 			SetComboTransition(ui->transitions, transition);
+		obs_set_output_source(0, transition);
+		obs_transition_swap_end(transition, oldTransition);
+	}
+	else {
+		obs_set_output_source(0, transition);
+	}
+
+	if (oldTransition)
+		obs_source_release(oldTransition);
+
+	bool fixed = transition ? obs_transition_fixed(transition) : false;
+	//ui->transitionDurationLabel->setVisible(!fixed);
+	//ui->transitionDuration->setVisible(!fixed);
+
+	bool configurable = obs_source_configurable(transition);
+	//ui->transitionRemove->setEnabled(configurable);
+	//ui->transitionProps->setEnabled(configurable);
+}
+
+
+
+
 
 void OBSWrapper::createDefaultScene(bool firstStart)
 {
 
-	//ClearSceneData();
-	//InitDefaultTransitions();
+	ClearSceneData();
+	InitDefaultTransitions();
 	//CreateDefaultQuickTransitions();
 	//ui->transitionDuration->setValue(300);
-	//SetTransition(fadeTransition);
+	SetTransition(fadeTransition);
 
 	scene = obs_scene_create("Basic.Scene");
 
 	//if (firstStart)
 	//	CreateFirstRunSources();
 
-	AddScene(obs_scene_get_source(scene));
+	//AddScene(obs_scene_get_source(scene));
 	//SetCurrentScene(scene, true);
-	obs_scene_release(scene);
-
+	//obs_scene_release(scene);
+	obs_source_t *source = obs_scene_get_source(scene);
+	SetCurrentScene(source, true);
 }
 
 

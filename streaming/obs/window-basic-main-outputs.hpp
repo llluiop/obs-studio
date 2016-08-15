@@ -1,5 +1,7 @@
 #pragma once
 
+#include <obs.hpp>
+
 #define DESKTOP_AUDIO_1 Str("DesktopAudioDevice1")
 #define DESKTOP_AUDIO_2 Str("DesktopAudioDevice2")
 #define AUX_AUDIO_1     Str("AuxAudioDevice1")

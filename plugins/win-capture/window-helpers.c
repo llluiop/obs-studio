@@ -23,13 +23,13 @@ static inline char *decode_str(const char *src)
 }
 
 extern void build_window_strings(const char *str,
-		char **class,
+		char **class_name,
 		char **title,
 		char **exe)
 {
 	char **strlist;
 
-	*class = NULL;
+	*class_name = NULL;
 	*title = NULL;
 	*exe   = NULL;
 
@@ -41,7 +41,7 @@ extern void build_window_strings(const char *str,
 
 	if (strlist && strlist[0] && strlist[1] && strlist[2]) {
 		*title = decode_str(strlist[0]);
-		*class = decode_str(strlist[1]);
+		*class_name = decode_str(strlist[1]);
 		*exe   = decode_str(strlist[2]);
 	}
 
@@ -120,18 +120,18 @@ static void get_window_title(struct dstr *name, HWND hwnd)
 	free(temp);
 }
 
-static void get_window_class(struct dstr *class, HWND hwnd)
+static void get_window_class(struct dstr *class_name, HWND hwnd)
 {
 	wchar_t temp[256];
 
 	temp[0] = 0;
 	if (GetClassNameW(hwnd, temp, sizeof(temp) / sizeof(wchar_t)))
-		dstr_from_wcs(class, temp);
+		dstr_from_wcs(class_name, temp);
 }
 
 static void add_window(obs_property_t *p, HWND hwnd)
 {
-	struct dstr class   = {0};
+	struct dstr class_name   = {0};
 	struct dstr title   = {0};
 	struct dstr exe     = {0};
 	struct dstr encoded = {0};
@@ -140,17 +140,17 @@ static void add_window(obs_property_t *p, HWND hwnd)
 	if (!get_window_exe(&exe, hwnd))
 		return;
 	get_window_title(&title, hwnd);
-	get_window_class(&class, hwnd);
+	get_window_class(&class_name, hwnd);
 
 	dstr_printf(&desc, "[%s]: %s", exe.array, title.array);
 
 	encode_dstr(&title);
-	encode_dstr(&class);
+	encode_dstr(&class_name);
 	encode_dstr(&exe);
 
 	dstr_cat_dstr(&encoded, &title);
 	dstr_cat(&encoded, ":");
-	dstr_cat_dstr(&encoded, &class);
+	dstr_cat_dstr(&encoded, &class_name);
 	dstr_cat(&encoded, ":");
 	dstr_cat_dstr(&encoded, &exe);
 
@@ -158,7 +158,7 @@ static void add_window(obs_property_t *p, HWND hwnd)
 
 	dstr_free(&encoded);
 	dstr_free(&desc);
-	dstr_free(&class);
+	dstr_free(&class_name);
 	dstr_free(&title);
 	dstr_free(&exe);
 }
@@ -217,7 +217,7 @@ void fill_window_list(obs_property_t *p, enum window_search_mode mode)
 
 static int window_rating(HWND window,
 		enum window_priority priority,
-		const char *class,
+		const char *class_name,
 		const char *title,
 		const char *exe)
 {
@@ -241,7 +241,7 @@ static int window_rating(HWND window,
 	else
 		exe_val += 3;
 
-	if (dstr_cmpi(&cur_class, class) == 0)
+	if (dstr_cmpi(&cur_class, class_name) == 0)
 		total += class_val;
 	if (dstr_cmpi(&cur_title, title) == 0)
 		total += title_val;
@@ -257,7 +257,7 @@ static int window_rating(HWND window,
 
 HWND find_window(enum window_search_mode mode,
 		enum window_priority priority,
-		const char *class,
+		const char *class_name,
 		const char *title,
 		const char *exe)
 {
@@ -266,7 +266,7 @@ HWND find_window(enum window_search_mode mode,
 	int  best_rating = 0;
 
 	while (window) {
-		int rating = window_rating(window, priority, class, title, exe);
+		int rating = window_rating(window, priority, class_name, title, exe);
 		if (rating > best_rating) {
 			best_rating = rating;
 			best_window = window;
@@ -280,28 +280,28 @@ HWND find_window(enum window_search_mode mode,
 
 void get_window_encode_strings(struct dstr * encode, const HWND window)
 {
-	struct dstr class = { 0 };
+	struct dstr class_name = { 0 };
 	struct dstr title = { 0 };
 	struct dstr exe = { 0 };
 
 	if (!get_window_exe(&exe, window))
 		return;
 	get_window_title(&title, window);
-	get_window_class(&class, window);
+	get_window_class(&class_name, window);
 
 
 	encode_dstr(&title);
-	encode_dstr(&class);
+	encode_dstr(&class_name);
 	encode_dstr(&exe);
 
 	dstr_cat_dstr(encode, &title);
 	dstr_cat(encode, ":");
-	dstr_cat_dstr(encode, &class);
+	dstr_cat_dstr(encode, &class_name);
 	dstr_cat(encode, ":");
 	dstr_cat_dstr(encode, &exe);
 
 
-	dstr_free(&class);
+	dstr_free(&class_name);
 	dstr_free(&title);
 	dstr_free(&exe);
 }
