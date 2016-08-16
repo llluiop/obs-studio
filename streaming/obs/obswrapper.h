@@ -12,15 +12,7 @@ struct AddSourceData {
 	bool visible;
 };
 
-struct MonitorInfo {
-	int32_t  x, y;
-	uint32_t cx, cy;
 
-	inline MonitorInfo() {}
-	inline MonitorInfo(int32_t x, int32_t y, uint32_t cx, uint32_t cy)
-		: x(x), y(y), cx(cx), cy(cy)
-	{}
-};
 
 class OBSWrapper
 {
@@ -51,19 +43,12 @@ public:
 	}
 
 private:
-	bool startOBS();
+	bool StartOBS();
 	bool ResetAudio();
-	void GetFPSCommon(uint32_t & num, uint32_t & den) const;
-	void GetFPSInteger(uint32_t & num, uint32_t & den) const;
-	void GetFPSFraction(uint32_t & num, uint32_t & den) const;
-	void GetFPSNanoseconds(uint32_t & num, uint32_t & den) const;
-	void GetConfigFPS(uint32_t & num, uint32_t & den) const;
-	const char* GetRenderModule();
 	int ResetVideo();
 	void ResetOutputs();
 	bool InitService();
 	bool LoadService();
-	void InitPrimitives();
 	void InitDefaultTransitions();
 	void Load(const char * file);
 	void SetCurrentScene(obs_source_t * scene, bool force);
@@ -71,9 +56,6 @@ private:
 	void ClearSceneData();
 	void SetTransition(obs_source_t * transition);
 	void createDefaultScene(bool firstStart);
-	void clearSceneData();
-	void AddScene(OBSSource source);
-	bool InitBasicConfigDefaults();
 	int GetProfilePath(char * path, size_t size, const char * file) const;
 	bool InitBasicConfig();
 	bool InitGlobalConfigDefaults();
@@ -88,12 +70,6 @@ private:
 	OBSService service;
 	OBSSource fadeTransition;
 
-	gs_vertbuffer_t *box = nullptr;
-	gs_vertbuffer_t *boxLeft = nullptr;
-	gs_vertbuffer_t *boxTop = nullptr;
-	gs_vertbuffer_t *boxRight = nullptr;
-	gs_vertbuffer_t *boxBottom = nullptr;
-	gs_vertbuffer_t *circle = nullptr;
 	std::unique_ptr<BasicOutputHandler> outputHandler;
 };
 
