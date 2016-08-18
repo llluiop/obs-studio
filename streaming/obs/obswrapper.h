@@ -13,18 +13,21 @@ struct AddSourceData {
 };
 
 
-
+class Streaming;
 class OBSWrapper
 {
 	const char* GAMESOURCE = "Window Capture";
 	const char* GAMESOURCEID = "window_capture";
 public:
-	OBSWrapper();
+	OBSWrapper(Streaming* streaming);
 	~OBSWrapper();
 
 public:
-	void APPInit();
-	bool CreateGameSource(const HWND window);
+	void Init();
+	bool SetGameSource(const HWND window);
+
+	bool StartStream();
+	void StopStream();
 
 
 	config_t *Config() const
@@ -55,11 +58,11 @@ private:
 	void TransitionToScene(obs_source_t * source, bool force);
 	void ClearSceneData();
 	void SetTransition(obs_source_t * transition);
-	void createDefaultScene(bool firstStart);
+	void createDefaultScene();
 	int GetProfilePath(char * path, size_t size, const char * file) const;
 	bool InitBasicConfig();
 	bool InitGlobalConfigDefaults();
-	bool initOBS();
+	bool InitOBS();
 
 
 
@@ -71,6 +74,8 @@ private:
 	OBSSource fadeTransition;
 
 	std::unique_ptr<BasicOutputHandler> outputHandler;
+
+	Streaming* streaming;
 };
 
 #endif // !__obs_h__

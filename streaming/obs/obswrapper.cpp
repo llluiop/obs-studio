@@ -16,7 +16,7 @@
 #include <fstream>
 #include <vector>
 #include <curl/curl.h>
-
+#include "../streaming.h"
 
 #include "video-config.h"
 #include "audio-config.h"
@@ -52,7 +52,8 @@ static void AddSource(void *_data, obs_scene_t *scene)
 }
 
 
-OBSWrapper::OBSWrapper()
+OBSWrapper::OBSWrapper(Streaming* streaming)
+:streaming(streaming)
 {
 
 }
@@ -62,24 +63,26 @@ OBSWrapper::~OBSWrapper()
 
 }
 
-void OBSWrapper::APPInit()
+void OBSWrapper::Init()
 {
 	StartOBS();
-	initOBS();
-
-	CreateGameSource((HWND)0x00040738);
+	InitOBS();	
 }
 
-bool OBSWrapper::CreateGameSource(const HWND window)
+bool OBSWrapper::StartOBS()
+{
+	char path[512];
+
+	if (os_get_config_path(path, sizeof(path), "obs-studio/plugin_config") <= 0)
+		return false;
+
+	return obs_startup("en-US", path, nullptr);
+}
+
+bool OBSWrapper::SetGameSource(const HWND window)
 {
 	obs_source_t *source = obs_get_source_by_name(GAMESOURCE);
-	if (source) {
-		//QMessageBox::information(parent,
-		//	QTStr("NameExists.Title"),
-		//	QTStr("NameExists.Text"));
-
-	}
-	else {
+	if (!source) {
 		source = obs_source_create(GAMESOURCEID, GAMESOURCE, NULL, nullptr);
 
 		if (source) {
@@ -105,7 +108,7 @@ bool OBSWrapper::CreateGameSource(const HWND window)
 
 	obs_data_t *svr = obs_service_get_settings(service);
 	obs_data_set_string(svr, "server", "rtmp://send1.douyu.com/live");
-	obs_data_set_string(svr, "key", "907136rsdA0bCN5b?wsSecret=7a538fe5c18a563bcca0bb07405c7c79&wsTime=57b28295");
+	obs_data_set_string(svr, "key", "907136r876cmgTM5?wsSecret=55c4147cf8e03ed11a98fc22dbfee120&wsTime=57b2cef2");
 	//obs_data_set_string(svr, "type", "rtmp_custom");
 
 
@@ -126,21 +129,20 @@ bool OBSWrapper::CreateGameSource(const HWND window)
 	obs_data_release(svr);
 	obs_data_release(data);
 
-
-	if (!outputHandler->StartStreaming(service)) {
-	}
-	return true;
+ 	return true;
 }
 
-bool OBSWrapper::StartOBS()
+bool OBSWrapper::StartStream()
 {
-	char path[512];
-
-	if (os_get_config_path(path, sizeof(path), "obs-studio/plugin_config") <= 0)
-		return false;
-
-	return obs_startup("en-US", path, nullptr);
+	return outputHandler->StartStreaming(service);
 }
+
+void OBSWrapper::StopStream()
+{
+	outputHandler->StopStreaming();
+}
+
+
 
 bool OBSWrapper::ResetAudio()
 {
@@ -158,70 +160,10 @@ int OBSWrapper::ResetVideo()
 
 
 
-bool OBSWrapper::InitGlobalConfigDefaults()
-{
-	char path[512];
-
-	int len = os_get_config_path(path, sizeof(path),
-		"obs-studio/global.ini");
-	if (len <= 0) {
-		return false;
-	}
-
-	int errorcode = config.Open(path, CONFIG_OPEN_ALWAYS);
-	if (errorcode != CONFIG_SUCCESS) {
-		//OBSErrorBox(NULL, "Failed to open global.ini: %d", errorcode);
-		return false;
-	}
-
-	config_set_default_string(config, "General", "Language",
-		"en-US");
-	config_set_default_uint(config, "General", "MaxLogs", 10);
-	config_set_default_string(config, "General", "ProcessPriority",
-		"Normal");
-
-
-	config_set_default_string(config, "Video", "Renderer",
-		"Direct3D 11");
-
-
-	config_set_default_bool(config, "BasicWindow", "PreviewEnabled",
-		true);
-	config_set_default_bool(config, "BasicWindow",
-		"PreviewProgramMode", false);
-	config_set_default_bool(config, "BasicWindow",
-		"SceneDuplicationMode", true);
-	config_set_default_bool(config, "BasicWindow",
-		"SwapScenesMode", true);
-	config_set_default_bool(config, "BasicWindow",
-		"SnappingEnabled", true);
-	config_set_default_bool(config, "BasicWindow",
-		"ScreenSnapping", true);
-	config_set_default_bool(config, "BasicWindow",
-		"SourceSnapping", true);
-	config_set_default_bool(config, "BasicWindow",
-		"CenterSnapping", false);
-	config_set_default_double(config, "BasicWindow",
-		"SnapDistance", 10.0);
-	config_set_default_bool(config, "BasicWindow",
-		"RecordWhenStreaming", false);
-	config_set_default_bool(config, "BasicWindow",
-		"KeepRecordingWhenStreamStops", false);
-	config_set_default_bool(config, "BasicWindow",
-		"ShowTransitions", true);
-	config_set_default_bool(config, "BasicWindow",
-		"ShowListboxToolbars", true);
-	config_set_default_bool(config, "BasicWindow",
-		"ShowStatusBar", true);
-
-
-	return true;
-}
-
 #define MAIN_SEPARATOR \
 	"====================================================================="
 
-bool OBSWrapper::initOBS()
+bool OBSWrapper::InitOBS()
 {
 	BasicConfig::MakeUserDirs();
 
@@ -291,24 +233,8 @@ bool OBSWrapper::initOBS()
 
 	BasicConfig::InitPrimitives();
 
-
-
 	Load(savePath);
 
-
-	//TimedCheckForUpdates();
-	//loaded = true;
-
-
-// 	uint32_t winVer = GetWindowsVersion();
-// 	if (winVer > 0 && winVer < 0x602) {
-// 		bool disableAero = config_get_bool(basicConfig, "Video",
-// 			"DisableAero");
-// 		SetAeroEnabled(!disableAero);
-
-
-	//RefreshSceneCollections();
-	//RefreshProfiles();
 
 	return true;
 }
@@ -404,7 +330,7 @@ void OBSWrapper::Load(const char *file)
 {
 	//if (!file || !os_file_exists(file)) {
 	//	blog(LOG_INFO, "No scene file found, creating default scene");
-		createDefaultScene(true); //create it always
+		createDefaultScene(); //create it always
 	//	return;
 	//}
 // 		ClearSceneData();
@@ -512,9 +438,8 @@ void OBSWrapper::SetTransition(obs_source_t *transition)
 
 
 
-void OBSWrapper::createDefaultScene(bool firstStart)
+void OBSWrapper::createDefaultScene()
 {
-
 	ClearSceneData();
 	InitDefaultTransitions();
 	//CreateDefaultQuickTransitions();
@@ -527,8 +452,7 @@ void OBSWrapper::createDefaultScene(bool firstStart)
 	//	CreateFirstRunSources();
 
 	//AddScene(obs_scene_get_source(scene));
-	//SetCurrentScene(scene, true);
-	//obs_scene_release(scene);
+
 	obs_source_t *source = obs_scene_get_source(scene);
 	SetCurrentScene(source, true);
 }
@@ -593,4 +517,66 @@ bool OBSWrapper::InitBasicConfig()
 	}
 
 	return BasicConfig::InitBasicConfigDefaults(basicConfig);
+}
+
+
+
+bool OBSWrapper::InitGlobalConfigDefaults()
+{
+	char path[512];
+
+	int len = os_get_config_path(path, sizeof(path),
+		"obs-studio/global.ini");
+	if (len <= 0) {
+		return false;
+	}
+
+	int errorcode = config.Open(path, CONFIG_OPEN_ALWAYS);
+	if (errorcode != CONFIG_SUCCESS) {
+		//OBSErrorBox(NULL, "Failed to open global.ini: %d", errorcode);
+		return false;
+	}
+
+	config_set_default_string(config, "General", "Language",
+		"en-US");
+	config_set_default_uint(config, "General", "MaxLogs", 10);
+	config_set_default_string(config, "General", "ProcessPriority",
+		"Normal");
+
+
+	config_set_default_string(config, "Video", "Renderer",
+		"Direct3D 11");
+
+
+	config_set_default_bool(config, "BasicWindow", "PreviewEnabled",
+		true);
+	config_set_default_bool(config, "BasicWindow",
+		"PreviewProgramMode", false);
+	config_set_default_bool(config, "BasicWindow",
+		"SceneDuplicationMode", true);
+	config_set_default_bool(config, "BasicWindow",
+		"SwapScenesMode", true);
+	config_set_default_bool(config, "BasicWindow",
+		"SnappingEnabled", true);
+	config_set_default_bool(config, "BasicWindow",
+		"ScreenSnapping", true);
+	config_set_default_bool(config, "BasicWindow",
+		"SourceSnapping", true);
+	config_set_default_bool(config, "BasicWindow",
+		"CenterSnapping", false);
+	config_set_default_double(config, "BasicWindow",
+		"SnapDistance", 10.0);
+	config_set_default_bool(config, "BasicWindow",
+		"RecordWhenStreaming", false);
+	config_set_default_bool(config, "BasicWindow",
+		"KeepRecordingWhenStreamStops", false);
+	config_set_default_bool(config, "BasicWindow",
+		"ShowTransitions", true);
+	config_set_default_bool(config, "BasicWindow",
+		"ShowListboxToolbars", true);
+	config_set_default_bool(config, "BasicWindow",
+		"ShowStatusBar", true);
+
+
+	return true;
 }

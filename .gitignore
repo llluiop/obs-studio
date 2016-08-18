@@ -85,3 +85,6 @@ tags
 */.DS_Store
 */**/.DS_Store
 /streaming.rar
+/streaming/.vscode
+/streaming/ipc/.vscode
+/streaming/obs/.vscode
