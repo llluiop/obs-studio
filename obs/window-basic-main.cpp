@@ -425,10 +425,10 @@ void OBSBasic::CreateFirstRunSources()
 
 	if (hasDesktopAudio)
 		ResetAudioDevice(App()->OutputAudioSource(), "default",
-				Str("Basic.DesktopDevice1"), 1);
+			"DesktopAudioDevice1", 1);
 	if (hasInputAudio)
 		ResetAudioDevice(App()->InputAudioSource(), "default",
-				Str("Basic.AuxDevice1"), 3);
+				"Basic.AuxDevice1", 3);
 }
 
 void OBSBasic::CreateDefaultScene(bool firstStart)
@@ -543,10 +543,10 @@ void OBSBasic::Load(const char *file)
 		name = curSceneCollection;
 
 	LoadAudioDevice(DESKTOP_AUDIO_1, 1, data);
-	LoadAudioDevice(DESKTOP_AUDIO_2, 2, data);
-	LoadAudioDevice(AUX_AUDIO_1,     3, data);
-	LoadAudioDevice(AUX_AUDIO_2,     4, data);
-	LoadAudioDevice(AUX_AUDIO_3,     5, data);
+	//LoadAudioDevice(DESKTOP_AUDIO_2, 2, data);
+	//LoadAudioDevice(AUX_AUDIO_1,     3, data);
+	//LoadAudioDevice(AUX_AUDIO_2,     4, data);
+	//LoadAudioDevice(AUX_AUDIO_3,     5, data);
 
 	obs_load_sources(sources, OBSBasic::SourceLoaded, this);
 

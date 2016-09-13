@@ -27,15 +27,7 @@ bool IPCWrapper::Send(TCHAR* lpInput)
 	return S_OK == SendMsg(lpInput, wcslen(lpInput), szOutPut, OUTBUFSIZE, 5000, _T("BrowserPluginServerPipe"));
 }
 
-bool IPCWrapper::RecivedMsg(int id, _tstring::SplitList& body)
-{
-	StreamMessage msg;
-	msg.type = StreamMessage::IPC_MSG;
-	msg.id = id;
-	msg.body = body;
 
-	return PostMsg(msg);
-}
 
 bool IPCWrapper::RecivedMsg(int id)
 {
@@ -45,6 +37,8 @@ bool IPCWrapper::RecivedMsg(int id)
 	
 	return PostMsg(msg);
 }
+
+
 
 bool IPCWrapper::PostMsg(const StreamMessage& msg)
 {

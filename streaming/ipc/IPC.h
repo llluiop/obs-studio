@@ -1,14 +1,14 @@
 #pragma once
 
 #define MSG_IPC_QUIT 0
-#define MSG_IPC_SETGAME 1
-#define MSG_IPC_STARTSTREAMING 2
-#define MSG_IPC_STOPSTREAMING 3
+#define MSG_IPC_STARTSTREAMING 1
+#define MSG_IPC_STOPSTREAMING 2
 
 #define MSG_OBS_STREAMING_FAILED 10
 
+#include "tstring.h"
+using namespace String;
 
-#include <string>
 struct  StreamMessage
 {
 	enum MsgType {
@@ -18,5 +18,5 @@ struct  StreamMessage
 
 	MsgType type;
 	int id;
-	std::string body;
+	_tstring::SplitList body;
 };

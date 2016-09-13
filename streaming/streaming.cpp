@@ -41,6 +41,11 @@ void Streaming::PostMsg(const StreamMessage& msg)
 
 void Streaming::HandleMsg()
 {
+	if (msgIncomingQueue.empty())
+	{
+		return;
+	}
+
 	{
 		std::lock_guard<std::mutex> guard(mutexMsg);
 		msgQueue.swap(msgIncomingQueue);
@@ -62,21 +67,25 @@ void Streaming::HandleMsg()
 	} while (!msgQueue.empty());
 }
 
-void Streaming::HandleIPCMsg(const StreamMessage& msg)
+void Streaming::HandleIPCMsg(StreamMessage& msg)
 {
 	if (msg.id == MSG_IPC_QUIT)
 	{
 		obsWrapper.StopStream();
 		exit = true;
 	}
-	if (msg.id == MSG_IPC_SETGAME)
-	{
-		int hwnd = atoi(msg.body.c_str());
-		obsWrapper.SetGameSource((HWND)hwnd);
-	}
 	if (msg.id == MSG_IPC_STARTSTREAMING)
 	{
+		obsWrapper.SetGameSource((HWND)atoi(msg.body.front().c_str()));
+		msg.body.pop_front();
+		obsWrapper.SetBitRate(msg.body.front().c_str());
+		msg.body.pop_front();
+		obsWrapper.SetSvrLocate(msg.body.front().c_str());
+		msg.body.pop_front();
+		obsWrapper.SetStreamingKey(msg.body.front().c_str());
+
 		obsWrapper.StartStream();
+
 	}
 	if (msg.id == MSG_IPC_STOPSTREAMING)
 	{
@@ -84,7 +93,7 @@ void Streaming::HandleIPCMsg(const StreamMessage& msg)
 	}
 }
 
-void Streaming::HandleOBSMsg(const StreamMessage& msg)
+void Streaming::HandleOBSMsg(StreamMessage& msg)
 {
 	if (msg.id == MSG_OBS_STREAMING_FAILED)
 	{

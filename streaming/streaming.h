@@ -19,8 +19,8 @@ public:
 
 private:
 	void HandleMsg();
-	void HandleIPCMsg(const StreamMessage& msg);
-	void HandleOBSMsg(const StreamMessage& msg);
+	void HandleIPCMsg(StreamMessage& msg);
+	void HandleOBSMsg(StreamMessage& msg);
 
 private:
 	OBSWrapper obsWrapper;

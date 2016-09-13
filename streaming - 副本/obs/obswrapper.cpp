@@ -109,75 +109,18 @@ bool OBSWrapper::SetGameSource(const HWND window)
 	obs_source_update(source, settings);
   	dstr_free(&encode);
 
-// 	obs_data_t *svr = obs_service_get_settings(service);
-// 	obs_data_set_string(svr, "server", "rtmp://send1.douyu.com/live");
-// 	obs_data_set_string(svr, "key", "907136rOlUwvw0Wp?wsSecret=9c50bfe02145ab7e8f915cdfa54a0ac9&wsTime=57c3a673");
-
-
-// 	char serviceJsonPath[512];
-// 	int ret = GetProfilePath(serviceJsonPath, sizeof(serviceJsonPath),
-// 		"service.json");
-// 	if (ret <= 0)
-// 		return false;
-// 
-// 	obs_data_t *data = obs_data_create();
-// 
-// 	obs_data_set_string(data, "type", obs_service_get_type(service));
-// 	obs_data_set_obj(data, "settings", svr);
-// 
-// 	if (!obs_data_save_json_safe(data, serviceJsonPath, "tmp", "bak"))
-// 		blog(LOG_WARNING, "Failed to save service");
-// 
-// 	obs_data_release(svr);
-// 	obs_data_release(data);
-
- 	return true;
-}
-
-bool OBSWrapper::SetStreamingKey(const std::string key)
-{
 	obs_data_t *svr = obs_service_get_settings(service);
-	if (svr == nullptr)
-	{
-		return false;
-	}
-	obs_data_set_string(svr, "service", "Twitch");
-	//obs_data_set_string(svr, "server", "rtmp://live-hkg.twitch.tv/app");
-	obs_data_set_string(svr, "key", key.c_str());
+	obs_data_set_string(svr, "server", "rtmp://send1.douyu.com/live");
+	obs_data_set_string(svr, "key", "907136rOlUwvw0Wp?wsSecret=9c50bfe02145ab7e8f915cdfa54a0ac9&wsTime=57c3a673");
+	//obs_data_set_string(svr, "type", "rtmp_custom");
 
-	obs_data_release(svr);
 
-	return true;
-}
-
-bool OBSWrapper::SetBitRate(const std::string bit)
-{
-	return false;
-}
-
-bool OBSWrapper::SetSvrLocate(const std::string loc)
-{
-	obs_data_t *svr = obs_service_get_settings(service);
-	if (svr == nullptr)
-	{
-		return false;
-	}
-	obs_data_set_string(svr, "server", loc.c_str());
-
-	obs_data_release(svr);
-
-	return true;
-}
-
-bool OBSWrapper::StartStream()
-{
 	char serviceJsonPath[512];
 	int ret = GetProfilePath(serviceJsonPath, sizeof(serviceJsonPath),
 		"service.json");
 	if (ret <= 0)
 		return false;
 
-	obs_data_t *svr = obs_service_get_settings(service);
 	obs_data_t *data = obs_data_create();
 
 	obs_data_set_string(data, "type", obs_service_get_type(service));
@@ -189,6 +132,26 @@ bool OBSWrapper::StartStream()
 	obs_data_release(svr);
 	obs_data_release(data);
 
+ 	return true;
+}
+
+bool OBSWrapper::SetStreamingKey(const std::string key)
+{
+	return false;
+}
+
+bool OBSWrapper::SetBitRate(const std::string bit)
+{
+	return false;
+}
+
+bool OBSWrapper::SetSvrLocate(const std::string loc)
+{
+	return false;
+}
+
+bool OBSWrapper::StartStream()
+{
 	return outputHandler->StartStreaming(service);
 }
 
@@ -490,58 +453,8 @@ void OBSWrapper::SetTransition(obs_source_t *transition)
 }
 
 
-static inline bool HasAudioDevices(const char *source_id)
-{
-	const char *output_id = source_id;
-	obs_properties_t *props = obs_get_source_properties(output_id);
-	size_t count = 0;
-
-	if (!props)
-		return false;
-
-	obs_property_t *devices = obs_properties_get(props, "device_id");
-	if (devices)
-		count = obs_property_list_item_count(devices);
-
-	obs_properties_destroy(props);
-
-	return count != 0;
-}
 
 
-
-void ResetAudioDevice(const char *sourceId, const char *deviceId,
-	const char *deviceDesc, int channel)
-{
-	obs_source_t *source;
-	obs_data_t *settings;
-	bool same = false;
-
-	source = obs_get_output_source(channel);
-	if (source) {
-		settings = obs_source_get_settings(source);
-		const char *curId = obs_data_get_string(settings, "device_id");
-
-		same = (strcmp(curId, deviceId) == 0);
-
-		obs_data_release(settings);
-		obs_source_release(source);
-	}
-
-	if (!same)
-		obs_set_output_source(channel, nullptr);
-
-	if (!same && strcmp(deviceId, "disabled") != 0) {
-		obs_data_t *settings = obs_data_create();
-		obs_data_set_string(settings, "device_id", deviceId);
-		source = obs_source_create(sourceId, deviceDesc, settings,
-			nullptr);
-		obs_data_release(settings);
-
-		obs_set_output_source(channel, source);
-		obs_source_release(source);
-	}
-}
 
 void OBSWrapper::createDefaultScene()
 {
@@ -553,15 +466,8 @@ void OBSWrapper::createDefaultScene()
 
 	scene = obs_scene_create("Basic.Scene");
 
-	bool hasDesktopAudio = HasAudioDevices("wasapi_output_capture");
-	bool hasInputAudio = HasAudioDevices("wasapi_input_capture");
-
-	if (hasDesktopAudio)
-		ResetAudioDevice("wasapi_output_capture", "default",
-			("Basic.DesktopDevice1"), 1);
-	if (hasInputAudio)
-		ResetAudioDevice("wasapi_input_capture", "default",
-			("Basic.AuxDevice1"), 3);
+	//if (firstStart)
+	//	CreateFirstRunSources();
 
 	//AddScene(obs_scene_get_source(scene));
 

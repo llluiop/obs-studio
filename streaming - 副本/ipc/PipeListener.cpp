@@ -2,6 +2,7 @@
 #include "tstring.h"
 #include "IPCWrapper.h"
 #include "ipc.h"
+#include "../internalmsg.h"
 
 using namespace String;
 
@@ -39,9 +40,19 @@ HRESULT CSDKPipeListener::HandleReadBuf( PIPEINST& Pipe )
 	{
 		ipcWrapper->RecivedMsg(nComand);
 	}
+	if (nComand == MSG_IPC_SETGAME)
+	{
+		StreamingSettting setting;
+		setting.hwnd = Comandlist.front().toUTF8().c_str(); Comandlist.pop_front();
+		setting.bitrate = Comandlist.front().toUTF8().c_str(); Comandlist.pop_front();
+		setting.key = Comandlist.front().toUTF8().c_str(); Comandlist.pop_front();
+		setting.loc = Comandlist.front().toUTF8().c_str();
+
+		ipcWrapper->RecivedMsg<StreamingSettting>(nComand, setting);
+	}
 	if (nComand == MSG_IPC_STARTSTREAMING)
 	{
-		ipcWrapper->RecivedMsg(nComand, Comandlist);
+		ipcWrapper->RecivedMsg(nComand);
 	}
 	if (nComand == MSG_IPC_STOPSTREAMING)
 	{
