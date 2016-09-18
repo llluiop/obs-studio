@@ -77,28 +77,45 @@ bool BasicConfig::MakeUserDirs()
 {
 	char path[512];
 
-	if (os_get_config_path(path, sizeof(path), "obs-studio/basic") <= 0)
+	if (os_get_config_path(path, sizeof(path), "arc/obs-studio/basic") <= 0)
 		return false;
 	if (!do_mkdir(path))
 		return false;
 
-	if (os_get_config_path(path, sizeof(path), "obs-studio/logs") <= 0)
+	if (os_get_config_path(path, sizeof(path), "arc/obs-studio/logs") <= 0)
 		return false;
 	if (!do_mkdir(path))
 		return false;
 
-	if (os_get_config_path(path, sizeof(path), "obs-studio/profiler_data") <= 0)
+	if (os_get_config_path(path, sizeof(path), "arc/obs-studio/profiler_data") <= 0)
 		return false;
 	if (!do_mkdir(path))
 		return false;
 
 #ifdef _WIN32
-	if (os_get_config_path(path, sizeof(path), "obs-studio/crashes") <= 0)
+	if (os_get_config_path(path, sizeof(path), "arc/obs-studio/crashes") <= 0)
 		return false;
 	if (!do_mkdir(path))
 		return false;
 #endif
-	if (os_get_config_path(path, sizeof(path), "obs-studio/plugin_config") <= 0)
+	if (os_get_config_path(path, sizeof(path), "arc/obs-studio/plugin_config") <= 0)
+		return false;
+	if (!do_mkdir(path))
+		return false;
+
+	return true;
+}
+
+bool BasicConfig::MakeUserProfileDirs()
+{
+	char path[512];
+
+	if (os_get_config_path(path, sizeof(path), "arc/obs-studio/basic/profiles") <= 0)
+		return false;
+	if (!do_mkdir(path))
+		return false;
+
+	if (os_get_config_path(path, sizeof(path), "arc/obs-studio/basic/scenes") <= 0)
 		return false;
 	if (!do_mkdir(path))
 		return false;

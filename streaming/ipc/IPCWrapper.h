@@ -14,7 +14,7 @@ public:
 
 public:
 	bool Listen();
-	bool Send(TCHAR* lpInput);
+	bool Send(int id, TCHAR* lpInput);
 	bool RecivedMsg(int id);
 	bool RecivedMsg(int id, _tstring::SplitList& body);
 

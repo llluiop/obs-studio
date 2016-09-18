@@ -22,16 +22,17 @@
 #include "audio-config.h"
 #include "basic-config.h"
 
+#define SERVICE_PATH "service.json"
+
 
 extern "C" void __declspec(dllexport) get_window_encode_strings(struct dstr *encode, const HWND window);
-
 
 static void AddExtraModulePaths()
 {
 	char base_module_dir[512];
 
 	int ret = os_get_program_data_path(base_module_dir, sizeof(base_module_dir),
-		"obs-studio/plugins/%module%");
+		"/arc/obs-studio/plugins/%module%");
 
 	if (ret <= 0)
 		return;
@@ -73,7 +74,7 @@ bool OBSWrapper::StartOBS()
 {
 	char path[512];
 
-	if (os_get_config_path(path, sizeof(path), "obs-studio/plugin_config") <= 0)
+	if (os_get_config_path(path, sizeof(path), "arc/obs-studio/plugin_config") <= 0)
 		return false;
 
 	return obs_startup("en-US", path, nullptr);
@@ -171,20 +172,26 @@ bool OBSWrapper::SetSvrLocate(const std::string loc)
 
 bool OBSWrapper::StartStream()
 {
-	char serviceJsonPath[512];
-	int ret = GetProfilePath(serviceJsonPath, sizeof(serviceJsonPath),
-		"service.json");
-	if (ret <= 0)
-		return false;
-
 	obs_data_t *svr = obs_service_get_settings(service);
 	obs_data_t *data = obs_data_create();
+
+	obs_service_t *newService = obs_service_create("rtmp_common",
+		"default_service", svr, nullptr);
+
+	service = newService;
+
+	char serviceJsonPath[512];
+	int ret = GetProfilePath(serviceJsonPath, sizeof(serviceJsonPath),
+		SERVICE_PATH);
+	if (ret <= 0)
+		return false;
 
 	obs_data_set_string(data, "type", obs_service_get_type(service));
 	obs_data_set_obj(data, "settings", svr);
 
 	if (!obs_data_save_json_safe(data, serviceJsonPath, "tmp", "bak"))
 		blog(LOG_WARNING, "Failed to save service");
+	obs_service_release(newService);
 
 	obs_data_release(svr);
 	obs_data_release(data);
@@ -195,6 +202,14 @@ bool OBSWrapper::StartStream()
 void OBSWrapper::StopStream()
 {
 	outputHandler->StopStreaming();
+}
+
+void OBSWrapper::StreamStop()
+{
+	StreamMessage msg;
+	msg.type = StreamMessage::OBS_MSG;
+
+	streaming->PostMsg(msg);
 }
 
 
@@ -233,6 +248,8 @@ bool OBSWrapper::InitOBS()
 	config_set_default_string(config, "Basic", "SceneCollectionFile",
 		("Untitled"));
 
+	BasicConfig::MakeUserProfileDirs();
+
 	const char *sceneCollection = config_get_string(config,
 		"Basic", "SceneCollectionFile");
 	char savePath[512];
@@ -242,7 +259,7 @@ bool OBSWrapper::InitOBS()
 	if (!sceneCollection)
 		throw "Failed to get scene collection name";
 
-	ret = snprintf(fileName, 512, "obs-studio/basic/scenes/%s.json",
+	ret = snprintf(fileName, 512, "arc/obs-studio/basic/scenes/%s.json",
 		sceneCollection);
 	if (ret <= 0)
 		throw "Failed to create scene collection file name";
@@ -322,7 +339,6 @@ bool OBSWrapper::InitService()
 	return true;
 }
 
-#define SERVICE_PATH "service.json"
 
 
 bool OBSWrapper::LoadService()
@@ -585,7 +601,7 @@ int OBSWrapper::GetProfilePath(char *path, size_t size, const char *file) const
 	if (!file)
 		file = "";
 
-	ret = os_get_config_path(profiles_path, 512, "obs-studio/basic/profiles");
+	ret = os_get_config_path(profiles_path, 512, "arc/obs-studio/basic/profiles");
 	if (ret <= 0)
 		return ret;
 

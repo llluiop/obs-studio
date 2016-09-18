@@ -6,6 +6,8 @@
 
 #define MSG_OBS_STREAMING_FAILED 10
 
+#define OBS_TO_CLIENT_STREAMING_FAILED 100
+
 #include "tstring.h"
 using namespace String;
 

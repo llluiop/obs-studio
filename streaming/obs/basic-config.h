@@ -19,6 +19,8 @@ public:
 public:	
 	static void InitPrimitives();
 	static bool MakeUserDirs();
+	static bool MakeUserProfileDirs();
+
 	static bool InitBasicConfigDefaults(const ConfigFile& basicConfig);
 
 private:
