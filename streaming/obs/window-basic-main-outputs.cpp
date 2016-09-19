@@ -28,7 +28,6 @@ static void OBSStreamStopping(void *data, calldata_t *params)
 	BasicOutputHandler *output = static_cast<BasicOutputHandler*>(data);
 	obs_output_t *obj = (obs_output_t*)calldata_ptr(params, "output");
 
-	output->main->StreamStop();
 
 	int sec = (int)obs_output_get_active_delay(obj);
 // 	if (sec == 0)
@@ -54,6 +53,9 @@ static void OBSStopStreaming(void *data, calldata_t *params)
 
 	output->streamingActive = false;
 	output->delayActive = false;
+
+	output->main->StreamStop();
+
 	//QMetaObject::invokeMethod(output->main,
 	//		"StreamingStop", Q_ARG(int, code));
 }

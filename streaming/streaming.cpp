@@ -97,7 +97,7 @@ void Streaming::HandleOBSMsg(StreamMessage& msg)
 {
 	if (msg.id == MSG_OBS_STREAMING_FAILED)
 	{
-		ipcWrapper.Send(OBS_TO_CLIENT_STREAMING_FAILED, _T("streaming failed"));
+		ipcWrapper.Send(OBS_TO_CLIENT_STREAMING_FAILED, _T(""));
 	}
 }
 

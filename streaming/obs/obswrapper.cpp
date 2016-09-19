@@ -208,6 +208,7 @@ void OBSWrapper::StreamStop()
 {
 	StreamMessage msg;
 	msg.type = StreamMessage::OBS_MSG;
+	msg.id = MSG_OBS_STREAMING_FAILED;
 
 	streaming->PostMsg(msg);
 }

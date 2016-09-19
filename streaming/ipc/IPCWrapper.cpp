@@ -25,8 +25,8 @@ bool IPCWrapper::Send(int id, TCHAR* lpInput)
 {
 	TCHAR szInput[INBUFSIZE] = { 0 };
 	_itow_s(id, szInput, 10);
-	_tcscat_s(szInput, _T("|"));
-	_tcscat_s(szInput, lpInput);
+// 	_tcscat_s(szInput, _T("|"));
+// 	_tcscat_s(szInput, lpInput);
 
 	TCHAR szOutPut[OUTBUFSIZE] = { 0 };
 	return S_OK == SendMsg(szInput, wcslen(szInput), szOutPut, OUTBUFSIZE, 5000, _T("BrowserPluginServerPipe"));
