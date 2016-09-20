@@ -143,9 +143,9 @@ bool OBSWrapper::SetStreamingKey(const std::string key)
 		return false;
 	}
 	obs_data_set_string(svr, "service", "Twitch");
-	//obs_data_set_string(svr, "server", "rtmp://live-hkg.twitch.tv/app");
 	obs_data_set_string(svr, "key", key.c_str());
-
+	//obs_data_set_string(svr, "server", "rtmp://send1.douyu.com/live");
+	//obs_data_set_string(svr, "key", "907136rqbhR6pYVU?wsSecret=0252f2bf8b07b5e01c57570b8e6e46b4&wsTime=57e0a81e");
 	obs_data_release(svr);
 
 	return true;
@@ -153,7 +153,17 @@ bool OBSWrapper::SetStreamingKey(const std::string key)
 
 bool OBSWrapper::SetBitRate(const std::string bit)
 {
-	return false;
+	obs_data_t *videoSettings = obs_data_create();
+	obs_data_set_int(videoSettings, "bitrate", atoi(bit.c_str()));
+
+	obs_service_apply_encoder_settings(service, videoSettings,
+		nullptr);
+
+	obs_data_release(videoSettings);
+	config_set_int(basicConfig, "SimpleOutput", "VBitrate", atoi(bit.c_str()));
+
+	ResetOutputs();
+	return true;
 }
 
 bool OBSWrapper::SetSvrLocate(const std::string loc)
@@ -164,7 +174,6 @@ bool OBSWrapper::SetSvrLocate(const std::string loc)
 		return false;
 	}
 	obs_data_set_string(svr, "server", loc.c_str());
-
 	obs_data_release(svr);
 
 	return true;
@@ -627,7 +636,7 @@ bool OBSWrapper::InitBasicConfig()
 		return false;
 	}
 
-	ret = os_get_config_path(configPath, sizeof(configPath), "basic.ini");
+	ret = GetProfilePath(configPath, sizeof(configPath), "basic.ini");
 	if (ret <= 0) {
 		return false;
 	}

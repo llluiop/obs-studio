@@ -258,16 +258,16 @@ bool BasicConfig::InitBasicConfigDefaults(const ConfigFile& basicConfig)
 	config_set_default_uint(basicConfig, "Output", "MaxRetries", 20);
 
 	int i = 0;
-	uint32_t scale_cx = 1024;
+	uint32_t scale_cx = cx;
 	uint32_t scale_cy = cy;
 
 	/* use a default scaled resolution that has a pixel count no higher
 	* than 1280x720 */
-	while (((scale_cx * scale_cy) > (1280 * 720)) && scaled_vals[i] > 0.0) {
+	/*while (((scale_cx * scale_cy) > (1280 * 720)) && scaled_vals[i] > 0.0) {
 		double scale = scaled_vals[i++];
 		scale_cx = uint32_t(double(cx) / scale);
 		scale_cy = uint32_t(double(cy) / scale);
-	}
+	}*/
 
 	config_set_default_uint(basicConfig, "Video", "OutputCX", scale_cx);
 	config_set_default_uint(basicConfig, "Video", "OutputCY", scale_cy);
