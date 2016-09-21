@@ -83,6 +83,8 @@ void Streaming::HandleIPCMsg(StreamMessage& msg)
 		obsWrapper.SetSvrLocate(msg.body.front().c_str());
 		msg.body.pop_front();
 		obsWrapper.SetStreamingKey(msg.body.front().c_str());
+		msg.body.pop_front();
+		obsWrapper.SetMuteMic(msg.body.front().c_str());
 
 		obsWrapper.StartStream();
 

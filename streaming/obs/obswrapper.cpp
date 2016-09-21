@@ -179,6 +179,19 @@ bool OBSWrapper::SetSvrLocate(const std::string loc)
 	return true;
 }
 
+bool OBSWrapper::SetMuteMic(const std::string mic)
+{
+	if (mic == "0")
+	{
+		obs_source_set_muted(micService, true);
+	}
+	else
+	{
+		obs_source_set_muted(micService, false);
+	}
+	return true;
+}
+
 bool OBSWrapper::StartStream()
 {
 	obs_data_t *svr = obs_service_get_settings(service);
@@ -299,7 +312,7 @@ bool OBSWrapper::InitOBS()
 			throw "Failed to initialize video:  Unspecified error";
 	}
 
-	//InitOBSCallbacks();
+	InitOBSCallbacks();
 	//InitHotkeys();
 
 	AddExtraModulePaths();
@@ -321,7 +334,28 @@ bool OBSWrapper::InitOBS()
 	return true;
 }
 
+void OBSWrapper::InitOBSCallbacks()
+{
+	signalHandlers.reserve(signalHandlers.size() +2);
+	signalHandlers.emplace_back(obs_get_signal_handler(), "source_activate",
+		OBSWrapper::SourceActivated, this);
 
+}
+
+void OBSWrapper::SourceActivated(void *data, calldata_t *params)
+{
+	obs_source_t *source = (obs_source_t*)calldata_ptr(params, "source");
+	uint32_t     flags = obs_source_get_output_flags(source);
+
+	if (flags & OBS_SOURCE_AUDIO)
+	{
+		OBSWrapper* wrap = static_cast<OBSWrapper*>(data);
+		if (strcmp(obs_source_get_name(source), "Basic.AuxDevice1") == 0)
+		{
+			wrap->micService = source;
+		}
+	}		
+}
 
 void OBSWrapper::ResetOutputs()
 {

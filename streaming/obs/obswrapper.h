@@ -6,6 +6,7 @@
 #include <string>
 #include <util/util.hpp>
 #include <memory>
+#include <vector>
 #include "window-basic-main-outputs.hpp"
 
 struct AddSourceData {
@@ -29,6 +30,7 @@ public:
 	bool SetStreamingKey(const std::string key);
 	bool SetBitRate(const std::string bit);
 	bool SetSvrLocate(const std::string loc);
+	bool SetMuteMic(const std::string mic);
 
 	bool StartStream();
 	void StopStream();
@@ -68,17 +70,21 @@ private:
 	bool InitBasicConfig();
 	bool InitGlobalConfigDefaults();
 	bool InitOBS();
+	void InitOBSCallbacks();
 
+	static void SourceActivated(void *data, calldata_t *params);
 
-
+;
 private:
 	obs_scene_t  *scene;
 	ConfigFile config;
 	ConfigFile basicConfig;
 	OBSService service;
 	OBSSource fadeTransition;
+	OBSSource micService;
 
 	std::unique_ptr<BasicOutputHandler> outputHandler;
+	std::vector<OBSSignal> signalHandlers;
 
 	Streaming* streaming;
 };
