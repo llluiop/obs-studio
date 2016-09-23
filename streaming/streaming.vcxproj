@@ -116,7 +116,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -125,11 +125,16 @@
       <AdditionalIncludeDirectories>..\build\obs;..\obs;..\libobs;..\thirdparty\dependencies2015\win32\include;..\build\config;..\deps\libff\.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\build\plugins\win-capture\Release\win-capture.lib;..\build\libobs\Release\obs.lib;..\build\deps\libff\Release\libff.lib;..\thirdparty\dependencies2015\win32\include\..\bin\libcurl.lib;..\thirdparty\dependencies2015\win32\include\..\bin\avcodec.lib;..\thirdparty\dependencies2015\win32\include\..\bin\avfilter.lib;..\thirdparty\dependencies2015\win32\include\..\bin\avdevice.lib;..\thirdparty\dependencies2015\win32\include\..\bin\avutil.lib;..\thirdparty\dependencies2015\win32\include\..\bin\swscale.lib;..\thirdparty\dependencies2015\win32\include\..\bin\avformat.lib;..\thirdparty\dependencies2015\win32\include\..\bin\swresample.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -E copy C:/Users/lllui/Documents/GitHub/obs-studio/build/Release/streaming.exe C:/Users/lllui/Documents/GitHub/obs-studio/build/rundir/Release/bin/32bit/streaming.exe</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>

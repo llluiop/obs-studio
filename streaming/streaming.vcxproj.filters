@@ -81,9 +81,6 @@
     <ClInclude Include="ipc\IPC.h">
       <Filter>Streaming\ipc</Filter>
     </ClInclude>
-    <ClInclude Include="internalmsg.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -133,9 +130,6 @@
     </ClCompile>
     <ClCompile Include="ipc\IPCWrapper.cpp">
       <Filter>Streaming\ipc</Filter>
-    </ClCompile>
-    <ClCompile Include="internalmsg.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
