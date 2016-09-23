@@ -35,7 +35,7 @@ public:
 	bool StartStream();
 	void StopStream();
 
-	void StreamStop();
+	void StreamFailed();
 
 	config_t *Config() const
 	{

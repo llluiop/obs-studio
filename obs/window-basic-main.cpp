@@ -543,10 +543,10 @@ void OBSBasic::Load(const char *file)
 		name = curSceneCollection;
 
 	LoadAudioDevice(DESKTOP_AUDIO_1, 1, data);
-	//LoadAudioDevice(DESKTOP_AUDIO_2, 2, data);
-	//LoadAudioDevice(AUX_AUDIO_1,     3, data);
-	//LoadAudioDevice(AUX_AUDIO_2,     4, data);
-	//LoadAudioDevice(AUX_AUDIO_3,     5, data);
+	LoadAudioDevice(DESKTOP_AUDIO_2, 2, data);
+	LoadAudioDevice(AUX_AUDIO_1,     3, data);
+	LoadAudioDevice(AUX_AUDIO_2,     4, data);
+	LoadAudioDevice(AUX_AUDIO_3,     5, data);
 
 	obs_load_sources(sources, OBSBasic::SourceLoaded, this);
 

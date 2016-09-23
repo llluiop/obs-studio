@@ -54,7 +54,11 @@ static void OBSStopStreaming(void *data, calldata_t *params)
 	output->streamingActive = false;
 	output->delayActive = false;
 
-	output->main->StreamStop();
+	if (code != OBS_OUTPUT_SUCCESS)
+	{
+		output->main->StreamFailed();
+	}
+
 
 	//QMetaObject::invokeMethod(output->main,
 	//		"StreamingStop", Q_ARG(int, code));

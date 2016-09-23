@@ -226,7 +226,7 @@ void OBSWrapper::StopStream()
 	outputHandler->StopStreaming();
 }
 
-void OBSWrapper::StreamStop()
+void OBSWrapper::StreamFailed()
 {
 	StreamMessage msg;
 	msg.type = StreamMessage::OBS_MSG;
