@@ -106,7 +106,7 @@ void Streaming::HandleOBSMsg(StreamMessage& msg)
 
 
 int main(int argc, char* argv)
-{
+{	
 	Streaming streaming;
 	streaming.Start();
 

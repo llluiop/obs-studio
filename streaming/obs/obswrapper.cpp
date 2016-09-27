@@ -698,7 +698,7 @@ bool OBSWrapper::InitGlobalConfigDefaults()
 	char path[512];
 
 	int len = os_get_config_path(path, sizeof(path),
-		"obs-studio/global.ini");
+		"arc/obs-studio/global.ini");
 	if (len <= 0) {
 		return false;
 	}
