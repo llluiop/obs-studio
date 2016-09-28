@@ -28,13 +28,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>false</UseOfMfc>
@@ -98,7 +98,7 @@
     </Link>
     <PostBuildEvent>
       <Command>setlocal
-"C:\Program Files (x86)\CMake\bin\cmake.exe" -E copy C:/Users/lllui/Documents/GitHub/obs-studio/build/Debug/streaming.exe C:/Users/lllui/Documents/GitHub/obs-studio/build/rundir/Debug/bin/32bit/streaming.exe</Command>
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -E copy D:/obs-studio/build/Debug/streaming.exe D:/obs-studio/build/rundir/Debug/bin/32bit/streaming.exe</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -118,7 +118,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -135,7 +135,7 @@
     </Link>
     <PostBuildEvent>
       <Command>setlocal
-"C:\Program Files (x86)\CMake\bin\cmake.exe" -E copy C:/Users/lllui/Documents/GitHub/obs-studio/build/Release/streaming.exe C:/Users/lllui/Documents/GitHub/obs-studio/build/rundir/Release/bin/32bit/streaming.exe</Command>
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -E copy D:/obs-studio/build/Release/streaming.exe D:/obs-studio/build/rundir/Release/bin/32bit/streaming.exe</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

@@ -22,6 +22,7 @@ private:
 	void HandleIPCMsg(StreamMessage& msg);
 	void HandleOBSMsg(StreamMessage& msg);
 
+	void ShouldExit();
 private:
 	OBSWrapper obsWrapper;
 	IPCWrapper ipcWrapper;

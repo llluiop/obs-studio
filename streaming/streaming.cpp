@@ -7,8 +7,8 @@
 #include "ipc\IPC.h"
 
 using namespace std;
-
-
+#define EVENT_STREAMING _T("Global\\CoreClient_Streaming")
+#define EVENT_CLIENT_START _T("Global\\CoreClient_StartEvent")
 
 Streaming::Streaming()
 :exit(false),
@@ -29,6 +29,7 @@ void Streaming::Start()
 	while (!exit)
 	{
 		HandleMsg();
+		ShouldExit();
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	}
 }
@@ -105,10 +106,25 @@ void Streaming::HandleOBSMsg(StreamMessage& msg)
 
 
 
+void Streaming::ShouldExit()
+{
+	HANDLE hEvent = ::OpenEvent(SYNCHRONIZE, FALSE, EVENT_CLIENT_START);
+	if (hEvent == NULL)
+	{
+		exit = true;
+	}
+	::CloseHandle(hEvent);
+}
+
 int main(int argc, char* argv)
 {	
+	HANDLE hInstance = ::CreateEvent(NULL, FALSE, FALSE, EVENT_STREAMING);
+	if (ERROR_ALREADY_EXISTS == ::GetLastError())
+		return -1;
+
 	Streaming streaming;
 	streaming.Start();
 
+	CloseHandle(hInstance);
 	return 0;
 }
