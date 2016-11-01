@@ -10,7 +10,7 @@ using namespace std;
 #define EVENT_STREAMING _T("Global\\CoreClient_Streaming")
 #define EVENT_CLIENT_START _T("Global\\CoreClient_StartEvent")
 
-#pragma comment( linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" ) // 设置入口地址  
+//#pragma comment( linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" ) // 设置入口地址  
 
 
 
@@ -91,6 +91,7 @@ void Streaming::HandleIPCMsg(StreamMessage& msg)
 		msg.body.pop_front();
 		obsWrapper.SetMuteMic(msg.body.front().c_str());
 
+		obsWrapper.SetFitScreen();
 		obsWrapper.StartStream();
 
 	}

@@ -31,7 +31,7 @@ public:
 	bool SetBitRate(const std::string bit);
 	bool SetSvrLocate(const std::string loc);
 	bool SetMuteMic(const std::string mic);
-
+	bool SetFitScreen();
 	bool StartStream();
 	void StopStream();
 

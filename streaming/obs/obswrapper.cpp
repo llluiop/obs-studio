@@ -192,6 +192,44 @@ bool OBSWrapper::SetMuteMic(const std::string mic)
 	return true;
 }
 
+
+static bool CenterAlignSelectedItems(obs_scene_t *scene, obs_sceneitem_t *item,
+	void *param)
+{
+	obs_bounds_type boundsType = *reinterpret_cast<obs_bounds_type*>(param);
+
+	//if (!obs_sceneitem_selected(item))
+	//	return true;
+
+	obs_video_info ovi;
+	obs_get_video_info(&ovi);
+
+	obs_transform_info itemInfo;
+	vec2_set(&itemInfo.pos, 0.0f, 0.0f);
+	vec2_set(&itemInfo.scale, 1.0f, 1.0f);
+	itemInfo.alignment = OBS_ALIGN_LEFT | OBS_ALIGN_TOP;
+	itemInfo.rot = 0.0f;
+
+	vec2_set(&itemInfo.bounds,
+		float(ovi.base_width), float(ovi.base_height));
+	itemInfo.bounds_type = boundsType;
+	itemInfo.bounds_alignment = OBS_ALIGN_CENTER;
+
+	obs_sceneitem_set_info(item, &itemInfo);
+
+	UNUSED_PARAMETER(scene);
+	return true;
+}
+
+bool OBSWrapper::SetFitScreen()
+{
+	obs_bounds_type boundsType = OBS_BOUNDS_SCALE_INNER;
+	obs_scene_enum_items(scene, CenterAlignSelectedItems,
+		&boundsType);
+
+	return true;
+}
+
 bool OBSWrapper::StartStream()
 {
 	obs_data_t *svr = obs_service_get_settings(service);
