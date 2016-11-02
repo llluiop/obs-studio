@@ -10,7 +10,7 @@ using namespace std;
 #define EVENT_STREAMING _T("Global\\CoreClient_Streaming")
 #define EVENT_CLIENT_START _T("Global\\CoreClient_StartEvent")
 
-//#pragma comment( linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" ) // 设置入口地址  
+#pragma comment( linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" ) // 设置入口地址  
 
 
 
@@ -123,6 +123,7 @@ void Streaming::ShouldExit()
 
 int main(int argc, char* argv)
 {	
+	system("pause");
 	HANDLE hInstance = ::CreateEvent(NULL, FALSE, FALSE, EVENT_STREAMING);
 	if (ERROR_ALREADY_EXISTS == ::GetLastError())
 		return -1;

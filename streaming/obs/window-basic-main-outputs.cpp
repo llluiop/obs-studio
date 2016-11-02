@@ -656,7 +656,7 @@ static void ensure_directory_exists(string &path)
 
 void SimpleOutput::StopStreaming()
 {
-	obs_output_force_stop(streamOutput);
+	obs_output_stop(streamOutput);
 }
 
 void SimpleOutput::ForceStopStreaming()
