@@ -123,7 +123,6 @@ void Streaming::ShouldExit()
 
 int main(int argc, char* argv)
 {	
-	system("pause");
 	HANDLE hInstance = ::CreateEvent(NULL, FALSE, FALSE, EVENT_STREAMING);
 	if (ERROR_ALREADY_EXISTS == ::GetLastError())
 		return -1;
